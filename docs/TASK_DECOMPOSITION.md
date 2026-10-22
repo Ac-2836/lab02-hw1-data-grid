@@ -15,7 +15,7 @@ verbatim.
 | - [x] 1.3 Sorting | Core | sort | Pure `sortRows()`; header `<button>`; `aria-sort` asc/desc/none | `feat(sort): add sortable column headers` | `src/sort.ts`, sortable headers |
 | - [x] 1.4 Filtering | Core | filter | Pure `filterRows()`; labelled `<input>`; result count in `aria-live` | `feat(filter): add text filter with live status` | `src/filter.ts`, filter control |
 | - [x] 1.5 Pagination | Core | pagination | Pure `paginate()`; `<nav aria-label>`; page status announced | `feat(pagination): add page navigation` | `src/paginate.ts`, pager controls |
-| - [ ] 1.6 Arrow-key navigation | Core | a11y | Roving `tabindex`; `keydown` + `e.key`; one delegated listener on the table | `feat(a11y): add arrow key cell navigation` | keyboard handler in `src/keyboard.ts` |
+| - [x] 1.6 Arrow-key navigation | Core | a11y | Roving `tabindex`; `keydown` + `e.key`; one delegated listener on the table | `feat(a11y): add arrow key cell navigation` | keyboard handler in `src/keyboard.ts` |
 | - [ ] 1.7 Row select and toggle | Core | a11y | Enter calls `onRowSelect`; Space toggles `aria-selected`; prevent page scroll | `feat(a11y): add enter select and space toggle` | selection logic + `aria-selected` |
 | - [ ] 1.8 Accessible theme | Core | ui | Contrast >= 4.5:1; visible `:focus-visible`; responsive | `feat(ui): add accessible theme and focus styles` | `src/styles.css` |
 | - [ ] 1.9 Lighthouse audit | Core | audit | 100/100 Accessibility + Best Practices; fix every finding | `docs(audit): record lighthouse results` | `docs/VERIFICATION.md` (scores; screenshots stay in local git-ignored `evidence/`) |

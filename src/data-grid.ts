@@ -1,4 +1,5 @@
 import { filterRows } from './filter.ts';
+import { setupGridKeyboard } from './keyboard.ts';
 import { paginate } from './paginate.ts';
 import { sortRows, type SortDirection } from './sort.ts';
 import type { DataGridProps } from './types.ts';
@@ -70,7 +71,7 @@ export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
 
   const tbody = document.createElement('tbody');
 
-  function renderBody(): void {
+  function fillBody(): void {
     const keys = props.columns.map((c) => c.accessorKey);
     const filtered = filterRows(props.data, query, keys);
     const column = props.columns[sortCol];
@@ -115,6 +116,11 @@ export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
     );
   }
 
+  function renderBody(): void {
+    fillBody();
+    keyboard.refresh();
+  }
+
   // none -> asc -> desc -> none; headers update in place to keep focus.
   function toggleSort(index: number): void {
     if (index !== sortCol) {
@@ -155,8 +161,9 @@ export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
     renderBody();
   });
 
-  renderBody();
   table.append(thead, tbody);
+  const keyboard = setupGridKeyboard(table);
+  renderBody();
   root.append(label, input, status, table, nav);
   return root;
 }
