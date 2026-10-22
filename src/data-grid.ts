@@ -182,6 +182,13 @@ export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
   table.append(thead, tbody);
   const keyboard = setupGridKeyboard(table, onCellKey);
   renderBody();
-  root.append(label, input, status, table, nav);
+  // Focusable so keyboard users can scroll the table on narrow screens.
+  const scroller = document.createElement('div');
+  scroller.className = 'grid-scroll';
+  scroller.setAttribute('role', 'region');
+  scroller.setAttribute('aria-label', `${props.ariaLabel} scroll area`);
+  scroller.tabIndex = 0;
+  scroller.append(table);
+  root.append(label, input, status, scroller, nav);
   return root;
 }

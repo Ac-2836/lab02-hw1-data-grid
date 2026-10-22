@@ -1,3 +1,4 @@
+import './styles.css';
 import { COLUMNS, EMPLOYEES } from './data.ts';
 import { renderDataGrid } from './data-grid.ts';
 
