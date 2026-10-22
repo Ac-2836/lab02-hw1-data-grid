@@ -1,13 +1,16 @@
 import { filterRows } from './filter.ts';
+import { paginate } from './paginate.ts';
 import { sortRows, type SortDirection } from './sort.ts';
 import type { DataGridProps } from './types.ts';
 
 const ARIA_SORT = { asc: 'ascending', desc: 'descending' } as const;
+const PAGE_SIZE = 10;
 let gridCount = 0;
 
 export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
   const filterId = `grid-filter-${++gridCount}`;
   let query = '';
+  let page = 1;
   let sortCol = -1;
   let direction: SortDirection = 'asc';
 
@@ -26,6 +29,19 @@ export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
 
   const table = document.createElement('table');
   table.setAttribute('role', 'grid');
+
+  const nav = document.createElement('nav');
+  nav.setAttribute('aria-label', 'Pagination');
+  const prev = document.createElement('button');
+  prev.type = 'button';
+  prev.dataset['page'] = '-1';
+  prev.textContent = 'Previous';
+  const pageText = document.createElement('span');
+  const next = document.createElement('button');
+  next.type = 'button';
+  next.dataset['page'] = '1';
+  next.textContent = 'Next';
+  nav.append(prev, pageText, next);
 
   const caption = document.createElement('caption');
   caption.textContent = props.ariaLabel;
@@ -58,10 +74,20 @@ export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
     const keys = props.columns.map((c) => c.accessorKey);
     const filtered = filterRows(props.data, query, keys);
     const column = props.columns[sortCol];
-    const rows = column
+    const sorted = column
       ? sortRows(filtered, column.accessorKey, direction)
       : filtered;
-    status.textContent = `Showing ${rows.length} of ${props.data.length} rows`;
+    const result = paginate(sorted, page, PAGE_SIZE);
+    const rows = result.rows;
+    page = result.page;
+    prev.disabled = page <= 1;
+    next.disabled = page >= result.pageCount;
+    pageText.textContent = `Page ${page} of ${result.pageCount}`;
+    // Same text must not be rewritten or screen readers repeat it.
+    const message =
+      `Showing ${filtered.length} of ${props.data.length} rows, ` +
+      `page ${page} of ${result.pageCount}`;
+    if (status.textContent !== message) status.textContent = message;
 
     if (rows.length === 0) {
       const td = document.createElement('td');
@@ -104,22 +130,33 @@ export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
       const active = button?.dataset['col'] === String(sortCol);
       th.setAttribute('aria-sort', active ? ARIA_SORT[direction] : 'none');
     });
+    page = 1;
     renderBody();
   }
 
   root.addEventListener('click', (e) => {
     if (!(e.target instanceof Element)) return;
     const button = e.target.closest<HTMLButtonElement>('button[data-col]');
-    if (button) toggleSort(Number(button.dataset['col']));
+    if (button) {
+      toggleSort(Number(button.dataset['col']));
+      return;
+    }
+    const pager = e.target.closest<HTMLButtonElement>('button[data-page]');
+    if (!pager) return;
+    page += Number(pager.dataset['page']);
+    renderBody();
+    // A button that just became disabled would drop keyboard focus.
+    if (pager.disabled) (pager === next ? prev : next).focus();
   });
   root.addEventListener('input', (e) => {
     if (e.target !== input) return;
     query = input.value;
+    page = 1;
     renderBody();
   });
 
   renderBody();
   table.append(thead, tbody);
-  root.append(label, input, status, table);
+  root.append(label, input, status, table, nav);
   return root;
 }
