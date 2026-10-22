@@ -11,6 +11,8 @@ let gridCount = 0;
 export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
   const filterId = `grid-filter-${++gridCount}`;
   let query = '';
+  const selected = new Set<T>();
+  const rowItems = new WeakMap<HTMLTableRowElement, T>();
   let page = 1;
   let sortCol = -1;
   let direction: SortDirection = 'asc';
@@ -30,6 +32,7 @@ export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
 
   const table = document.createElement('table');
   table.setAttribute('role', 'grid');
+  table.setAttribute('aria-multiselectable', 'true');
 
   const nav = document.createElement('nav');
   nav.setAttribute('aria-label', 'Pagination');
@@ -105,6 +108,8 @@ export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
       ...rows.map((item) => {
         const tr = document.createElement('tr');
         tr.setAttribute('role', 'row');
+        tr.setAttribute('aria-selected', String(selected.has(item)));
+        rowItems.set(tr, item);
         for (const col of props.columns) {
           const td = document.createElement('td');
           td.setAttribute('role', 'gridcell');
@@ -119,6 +124,19 @@ export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
   function renderBody(): void {
     fillBody();
     keyboard.refresh();
+  }
+
+  // Enter reports the row; Space toggles it. Empty-state row is unmapped.
+  function onCellKey(row: HTMLTableRowElement, key: 'Enter' | ' '): boolean {
+    const item = rowItems.get(row);
+    if (item === undefined) return false;
+    if (key === 'Enter') {
+      props.onRowSelect?.(item);
+    } else {
+      if (!selected.delete(item)) selected.add(item);
+      row.setAttribute('aria-selected', String(selected.has(item)));
+    }
+    return true;
   }
 
   // none -> asc -> desc -> none; headers update in place to keep focus.
@@ -162,7 +180,7 @@ export function renderDataGrid<T>(props: DataGridProps<T>): HTMLElement {
   });
 
   table.append(thead, tbody);
-  const keyboard = setupGridKeyboard(table);
+  const keyboard = setupGridKeyboard(table, onCellKey);
   renderBody();
   root.append(label, input, status, table, nav);
   return root;

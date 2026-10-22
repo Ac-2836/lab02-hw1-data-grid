@@ -44,12 +44,17 @@ export function nextCell(
  * Roving tabindex: exactly one element in the table is a tab stop. A header
  * with a sort button targets the button, any other cell targets itself.
  * refresh() only re-marks the tab stop and never moves focus, so re-renders
- * triggered from the filter input do not steal it.
+ * triggered from the filter input do not steal it. Enter/Space on a body
+ * cell go to onCellKey (true = handled) from the same single listener.
  */
-export function setupGridKeyboard(table: HTMLTableElement): {
+export function setupGridKeyboard(
+  table: HTMLTableElement,
+  onCellKey?: (row: HTMLTableRowElement, key: 'Enter' | ' ') => boolean,
+): {
   refresh: () => void;
 } {
   let active: CellPos = { row: 0, col: 0 };
+  let selectable = false;
 
   const focusTarget = (pos: CellPos): HTMLElement | null => {
     const cell = table.rows[pos.row]?.cells[pos.col];
@@ -81,7 +86,17 @@ export function setupGridKeyboard(table: HTMLTableElement): {
       e.key,
       counts,
     );
-    if (!next) return;
+    if (!next) {
+      // Body cells only: header buttons keep their native Enter/Space.
+      const key = e.key;
+      if (cell.tagName !== 'TD') return;
+      if (key !== 'Enter' && key !== ' ') return;
+      // Auto-repeat must not re-fire; it still blocks scroll if the first
+      // keydown was handled (selectable row).
+      if (!e.repeat) selectable = onCellKey?.(rowEl, key) ?? false;
+      if (selectable) e.preventDefault();
+      return;
+    }
     e.preventDefault();
     active = next;
     refresh();

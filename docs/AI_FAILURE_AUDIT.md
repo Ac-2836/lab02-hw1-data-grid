@@ -43,3 +43,35 @@ Copy this template for each failure (number entries 01, 02, 03, ...):
   the same Playwright/Chrome check shows an empty console and a single
   200 request. `evidence/0.1-after-fix-console.png` (data page rendered from
   the captured log, not a DevTools panel screenshot).
+
+## AI Failure 02: held Space auto-repeat toggles row selection repeatedly
+
+- **AI Prompt:** Task 1.7 Row select and toggle: Enter calls `onRowSelect`;
+  Space toggles `aria-selected`; prevent page scroll.
+- **AI Generated Code:** The Enter/Space branch in the `keydown` handler of
+  `src/keyboard.ts` forwards every event to `onCellKey` without checking
+  `e.repeat`. `onCellKey` in `src/data-grid.ts` flips the row's selection on
+  each call, so key auto-repeat re-toggles the row.
+- **Risk:** A normal press of Space that lasts longer than the OS repeat delay
+  (about 0.5 s) fires many keydowns and flips `aria-selected` many times, so
+  the final state is unpredictable and a screen reader announces every flip.
+  Held Enter likewise calls `onRowSelect` repeatedly.
+- **Detection Method / DevTools Proof:** Playwright on own Chrome, focus on a
+  body cell, CDP `Input.dispatchKeyEvent` sends one keyDown plus five
+  `autoRepeat` keyDowns and one keyUp (one physical press). A MutationObserver
+  on `aria-selected` recorded 6 toggles (true, false, true, false, true,
+  false) and the keydown log shows `repeat: true` on the five repeats.
+  Evidence: `evidence/1.7-space-hold-before-fix.png` and
+  `evidence/1.7-space-hold-before-fix-data.png` (data page rendered from the
+  captured events, not a DevTools panel screenshot).
+- **Engineering Refactor / Manual Fix:** In the Enter/Space branch of the
+  `keydown` handler in `src/keyboard.ts`, `onCellKey` now runs only when
+  `!e.repeat`. Auto-repeat keydowns still call `preventDefault()` when the
+  first press was handled, so the page does not scroll; the empty-state row
+  is never prevented.
+- **Verification Evidence:** After the fix, the same CDP replay (one keyDown
+  plus five `autoRepeat` keyDowns) gives exactly 1 `aria-selected` toggle
+  and all repeats `defaultPrevented`; a held Enter calls `onRowSelect` once.
+  `evidence/1.7-space-hold-after-fix.png` and
+  `evidence/1.7-space-hold-after-fix-data.png` (data page rendered from the
+  captured events, not a DevTools panel screenshot).
