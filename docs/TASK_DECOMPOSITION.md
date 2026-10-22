@@ -9,7 +9,7 @@ verbatim.
 
 | Task | Level | Scope | Constraint | Commit | Deliverables |
 |---|---|---|---|---|---|
-| - [ ] 0.1 Scaffold project | Awareness | build | Vite + TypeScript, strict mode; no extra deps | `build(setup): scaffold vite typescript project` | `package.json`, `vite.config.ts`, `tsconfig.json`, `index.html` |
+| - [ ] 0.1 Scaffold project | Awareness | build | Vite + TypeScript, strict mode; no extra deps | `build(setup): scaffold vite typescript project` | `package.json`, `vite.config.ts`, `tsconfig.json`, `index.html`, `.gitignore` (`evidence/`, `node_modules/`, `dist/`) |
 | - [ ] 1.1 Define grid contract | Core | contract | Exact slide interfaces `ColumnDef<T>`, `DataGridProps<T>`; no `any` | `feat(contract): define data grid types` | `src/types.ts`, sample dataset `src/data.ts` |
 | - [ ] 1.2 Render semantic table | Core | grid | `<table>`, `<caption>`, `<thead>`, `<tbody>`, `<th scope="col">`; ARIA grid roles; `textContent` only | `feat(grid): render semantic table structure` | `src/data-grid.ts` render function |
 | - [ ] 1.3 Sorting | Core | sort | Pure `sortRows()`; header `<button>`; `aria-sort` asc/desc/none | `feat(sort): add sortable column headers` | `src/sort.ts`, sortable headers |
@@ -18,5 +18,5 @@ verbatim.
 | - [ ] 1.6 Arrow-key navigation | Core | a11y | Roving `tabindex`; `keydown` + `e.key`; one delegated listener on the table | `feat(a11y): add arrow key cell navigation` | keyboard handler in `src/keyboard.ts` |
 | - [ ] 1.7 Row select and toggle | Core | a11y | Enter calls `onRowSelect`; Space toggles `aria-selected`; prevent page scroll | `feat(a11y): add enter select and space toggle` | selection logic + `aria-selected` |
 | - [ ] 1.8 Accessible theme | Core | ui | Contrast >= 4.5:1; visible `:focus-visible`; responsive | `feat(ui): add accessible theme and focus styles` | `src/styles.css` |
-| - [ ] 1.9 Lighthouse audit | Core | audit | 100/100 Accessibility + Best Practices; fix every finding | `docs(audit): add lighthouse evidence` | `evidence/lighthouse.png` (or report) |
+| - [ ] 1.9 Lighthouse audit | Core | audit | 100/100 Accessibility + Best Practices; fix every finding | `docs(audit): record lighthouse results` | `docs/VERIFICATION.md` (scores; screenshots stay in local git-ignored `evidence/`) |
 | - [ ] 1.10 README | Awareness | docs | How to run, features, keyboard map | `docs(readme): document usage and keyboard map` | `README.md` |
