@@ -18,5 +18,5 @@ verbatim.
 | - [x] 1.6 Arrow-key navigation | Core | a11y | Roving `tabindex`; `keydown` + `e.key`; one delegated listener on the table | `feat(a11y): add arrow key cell navigation` | keyboard handler in `src/keyboard.ts` |
 | - [x] 1.7 Row select and toggle | Core | a11y | Enter calls `onRowSelect`; Space toggles `aria-selected`; prevent page scroll | `feat(a11y): add enter select and space toggle` | selection logic + `aria-selected` |
 | - [x] 1.8 Accessible theme | Core | ui | Contrast >= 4.5:1; visible `:focus-visible`; responsive | `feat(ui): add accessible theme and focus styles` | `src/styles.css` |
-| - [ ] 1.9 Lighthouse audit | Core | audit | 100/100 Accessibility + Best Practices; fix every finding | `docs(audit): record lighthouse results` | `docs/VERIFICATION.md` (scores; screenshots stay in local git-ignored `evidence/`) |
+| - [x] 1.9 Lighthouse audit | Core | audit | 100/100 Accessibility + Best Practices; fix every finding | `docs(audit): record lighthouse results` | `docs/VERIFICATION.md` (scores; screenshots stay in local git-ignored `evidence/`) |
 | - [ ] 1.10 README | Awareness | docs | How to run, features, keyboard map | `docs(readme): document usage and keyboard map` | `README.md` |
